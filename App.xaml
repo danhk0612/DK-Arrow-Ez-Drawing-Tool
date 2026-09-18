@@ -4,5 +4,42 @@
              ShutdownMode="OnMainWindowClose"
              StartupUri="MainWindow.xaml">
     <Application.Resources>
+        <DrawingImage x:Key="AppIconImage">
+            <DrawingImage.Drawing>
+                <DrawingGroup>
+                    <GeometryDrawing Brush="#1F2937"
+                                     Geometry="M0,0 L64,0 64,64 0,64 Z"/>
+                    <GeometryDrawing>
+                        <GeometryDrawing.Pen>
+                            <Pen Brush="White"
+                                 Thickness="6"
+                                 StartLineCap="Round"
+                                 EndLineCap="Round"
+                                 LineJoin="Round"/>
+                        </GeometryDrawing.Pen>
+                        <GeometryDrawing.Geometry>
+                            <PathGeometry>
+                                <PathFigure StartPoint="12,46">
+                                    <LineSegment Point="12,20"/>
+                                    <LineSegment Point="43,20"/>
+                                </PathFigure>
+                            </PathGeometry>
+                        </GeometryDrawing.Geometry>
+                    </GeometryDrawing>
+                    <GeometryDrawing Brush="#38BDF8"
+                                     Geometry="M40,8 L58,20 40,32 Z"/>
+                    <GeometryDrawing Brush="#FBBF24">
+                        <GeometryDrawing.Geometry>
+                            <EllipseGeometry Center="12,46" RadiusX="5" RadiusY="5"/>
+                        </GeometryDrawing.Geometry>
+                    </GeometryDrawing>
+                    <GeometryDrawing Brush="#FBBF24">
+                        <GeometryDrawing.Geometry>
+                            <EllipseGeometry Center="12,20" RadiusX="5" RadiusY="5"/>
+                        </GeometryDrawing.Geometry>
+                    </GeometryDrawing>
+                </DrawingGroup>
+            </DrawingImage.Drawing>
+        </DrawingImage>
     </Application.Resources>
 </Application>
