@@ -181,9 +181,61 @@ public partial class MainWindow : Window
         NameTextBox.IsEnabled = enabled;
         ColorHexTextBox.IsEnabled = enabled;
         ChooseColorButton.IsEnabled = enabled;
+        ColorPresetPanel.IsEnabled = enabled;
         ThicknessSlider.IsEnabled = enabled;
         ThicknessTextBox.IsEnabled = enabled;
         DeleteArrowButton.IsEnabled = enabled;
+    }
+
+    private void ExportSuffixTextBox_TextChanged(object sender, TextChangedEventArgs e)
+    {
+        if (_updatingSettingsUi)
+            return;
+
+        _settings.ExportSuffix = ExportSuffixTextBox.Text;
+        SaveAppSettings();
+    }
+
+    private void RememberLastCreatedArrowStyle(IReadOnlyList<ArrowItem> selected)
+    {
+        if (selected.Count != 1 || _lastCreatedArrowId is null || selected[0].Id != _lastCreatedArrowId.Value)
+            return;
+
+        _settings.LastArrowColorHex = selected[0].ColorHex;
+        _settings.LastArrowThickness = selected[0].Thickness;
+        SaveAppSettings();
+    }
+
+    private void LoadAppSettings()
+    {
+        if (!File.Exists(_settingsPath))
+            return;
+
+        try
+        {
+            var loaded = JsonSerializer.Deserialize<AppSettings>(File.ReadAllText(_settingsPath));
+            if (loaded is null)
+                return;
+
+            var color = NormalizeColor(loaded.LastArrowColorHex);
+            loaded.LastArrowColorHex = color ?? "#FF0000";
+            loaded.LastArrowThickness = Math.Clamp(loaded.LastArrowThickness, 1, 30);
+            loaded.ExportSuffix ??= "_arrows";
+            _settings = loaded;
+        }
+        catch
+        {
+            _settings = new AppSettings();
+        }
+    }
+
+    private void SaveAppSettings()
+    {
+        var directory = IoPath.GetDirectoryName(_settingsPath);
+        if (!string.IsNullOrWhiteSpace(directory))
+            Directory.CreateDirectory(directory);
+
+        File.WriteAllText(_settingsPath, JsonSerializer.Serialize(_settings, new JsonSerializerOptions { WriteIndented = true }));
     }
 
     private string GetBackgroundBaseName()
