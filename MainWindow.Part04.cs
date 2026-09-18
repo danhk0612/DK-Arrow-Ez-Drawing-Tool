@@ -47,6 +47,7 @@ public partial class MainWindow : Window
         _updatingEditor = false;
         ArrowList.Items.Refresh();
         RedrawAllArrows();
+        RememberLastCreatedArrowStyle(selected);
     }
 
     private void ThicknessTextBox_TextChanged(object sender, TextChangedEventArgs e)
@@ -67,6 +68,7 @@ public partial class MainWindow : Window
         _updatingEditor = false;
         ArrowList.Items.Refresh();
         RedrawAllArrows();
+        RememberLastCreatedArrowStyle(selected);
     }
 
     private void DeleteArrowButton_Click(object sender, RoutedEventArgs e)
@@ -151,6 +153,7 @@ public partial class MainWindow : Window
             _arrows.Add(arrow);
 
         _arrowCounter = Math.Max(1, _arrows.Count + 1);
+        _lastCreatedArrowId = null;
         ClearDraft();
         EndPointDrag();
         _isDrawing = false;
@@ -170,13 +173,14 @@ public partial class MainWindow : Window
         }
 
         var includeBackground = IncludeBackgroundCheckBox.IsChecked == true;
+        var exportSuffix = ExportSuffixTextBox.Text + (includeBackground ? "_bg" : string.Empty);
         var dialog = new WpfSaveFileDialog
         {
             Title = includeBackground ? "배경 포함 PNG 출력" : "투명 PNG 출력",
             Filter = "PNG 이미지|*.png",
             DefaultExt = ".png",
             AddExtension = true,
-            FileName = GetBackgroundBaseName() + (includeBackground ? "_arrows_bg.png" : "_arrows.png")
+            FileName = GetBackgroundBaseName() + exportSuffix + ".png"
         };
 
         if (dialog.ShowDialog() != true)
