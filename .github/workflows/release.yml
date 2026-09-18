@@ -2,90 +2,84 @@ name: Build and Release v1.0.0
 
 on:
   push:
-    branches:
-      - main
+    branches: [ main ]
+  workflow_dispatch:
 
 permissions:
   contents: write
 
+concurrency:
+  group: dkarrow-v1-release
+  cancel-in-progress: true
+
+env:
+  VERSION: 1.0.0
+  PROJECT: DKArrowEzDrawingTool.csproj
+  RID: win-x64
+
 jobs:
-  release:
+  build-release:
     runs-on: windows-latest
+
     steps:
       - name: Checkout
         uses: actions/checkout@v4
 
-      - name: Check release source bundle
-        id: source
-        shell: pwsh
-        run: |
-          $parts = Get-ChildItem "source/parts/part*.txt" -ErrorAction SilentlyContinue | Sort-Object Name
-          if ($parts.Count -eq 9) {
-            "ready=true" >> $env:GITHUB_OUTPUT
-          } else {
-            "ready=false" >> $env:GITHUB_OUTPUT
-          }
-
-      - name: Expand source bundle into repository
-        if: steps.source.outputs.ready == 'true'
-        shell: pwsh
-        run: |
-          $partFiles = Get-ChildItem "source/parts/part*.txt" | Sort-Object Name
-          $base64 = ($partFiles | ForEach-Object { Get-Content $_.FullName -Raw }) -join ""
-          $zipPath = Join-Path $env:RUNNER_TEMP "DK-Arrow-Ez-Drawing-Tool-v1.0.0-source.zip"
-          $extractPath = Join-Path $env:RUNNER_TEMP "dkarrow-source"
-          [IO.File]::WriteAllBytes($zipPath, [Convert]::FromBase64String($base64))
-          Expand-Archive -Path $zipPath -DestinationPath $extractPath -Force
-          Get-ChildItem "MainWindow.Part*.cs" -ErrorAction SilentlyContinue | Remove-Item -Force
-          if (Test-Path "Assets") { Remove-Item "Assets" -Recurse -Force }
-          Copy-Item (Join-Path $extractPath "ArrowOverlayTool\*") "." -Recurse -Force
-          Remove-Item "source" -Recurse -Force
-
-      - name: Commit prepared source
-        if: steps.source.outputs.ready == 'true'
-        shell: pwsh
-        run: |
-          git config user.name "github-actions[bot]"
-          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
-          git add -A
-          if (-not (git diff --cached --quiet)) {
-            git commit -m "Prepare DK Arrow Ez Drawing Tool v1.0.0"
-            git push origin HEAD:main
-          }
-
-      - name: Setup .NET
-        if: steps.source.outputs.ready == 'true'
+      - name: Setup .NET 8
         uses: actions/setup-dotnet@v4
         with:
-          dotnet-version: '8.0.x'
+          dotnet-version: 8.0.x
 
       - name: Restore
-        if: steps.source.outputs.ready == 'true'
-        run: dotnet restore .\DKArrowEzDrawingTool.csproj
+        shell: pwsh
+        run: dotnet restore $env:PROJECT
 
       - name: Build
-        if: steps.source.outputs.ready == 'true'
-        run: dotnet build .\DKArrowEzDrawingTool.csproj -c Release --no-restore
+        shell: pwsh
+        run: dotnet build $env:PROJECT -c Release --no-restore
 
       - name: Publish Windows x64 self-contained
-        if: steps.source.outputs.ready == 'true'
         shell: pwsh
         run: |
-          dotnet publish .\DKArrowEzDrawingTool.csproj -c Release -r win-x64 --self-contained true -p:PublishSingleFile=true -p:IncludeNativeLibrariesForSelfExtract=true -p:DebugType=None -p:DebugSymbols=false -o publish
-          New-Item -ItemType Directory -Path artifacts -Force | Out-Null
-          Compress-Archive -Path publish\* -DestinationPath artifacts\DK-Arrow-Ez-Drawing-Tool-v1.0.0-win-x64.zip -Force
-          Copy-Item (Join-Path $env:RUNNER_TEMP "DK-Arrow-Ez-Drawing-Tool-v1.0.0-source.zip") artifacts\DK-Arrow-Ez-Drawing-Tool-v1.0.0-source.zip -Force
+          dotnet publish $env:PROJECT `
+            -c Release `
+            -r $env:RID `
+            --self-contained true `
+            -p:PublishSingleFile=true `
+            -p:IncludeNativeLibrariesForSelfExtract=true `
+            -p:DebugType=None `
+            -p:DebugSymbols=false `
+            -o publish
 
-      - name: Create GitHub release
-        if: steps.source.outputs.ready == 'true'
+      - name: Package release
+        shell: pwsh
+        run: |
+          New-Item -ItemType Directory -Path artifacts -Force | Out-Null
+          $binaryZip = "DK-Arrow-Ez-Drawing-Tool-v$env:VERSION-win-x64.zip"
+          $sourceZip = "DK-Arrow-Ez-Drawing-Tool-v$env:VERSION-source.zip"
+          Compress-Archive -Path "publish\*" -DestinationPath "artifacts\$binaryZip" -CompressionLevel Optimal -Force
+          git archive --format=zip --output="artifacts\$sourceZip" HEAD
+          "BINARY_ZIP=$binaryZip" | Out-File -FilePath $env:GITHUB_ENV -Append
+          "SOURCE_ZIP=$sourceZip" | Out-File -FilePath $env:GITHUB_ENV -Append
+
+      - name: Upload workflow artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: DK-Arrow-Ez-Drawing-Tool-v1.0.0
+          path: artifacts/*.zip
+          if-no-files-found: error
+
+      - name: Create or update GitHub Release
         shell: pwsh
         env:
           GH_TOKEN: ${{ github.token }}
         run: |
-          if (gh release view v1.0.0 2>$null) {
-            gh release upload v1.0.0 artifacts\DK-Arrow-Ez-Drawing-Tool-v1.0.0-win-x64.zip artifacts\DK-Arrow-Ez-Drawing-Tool-v1.0.0-source.zip --clobber
+          $tag = "v$env:VERSION"
+          $binary = "artifacts\$env:BINARY_ZIP"
+          $source = "artifacts\$env:SOURCE_ZIP"
+          if (gh release view $tag 2>$null) {
+            gh release upload $tag $binary $source --clobber
+            gh release edit $tag --title "DK Arrow Ez Drawing Tool $tag" --notes-file RELEASE_NOTES.md
           } else {
-            git tag v1.0.0
-            git push origin v1.0.0
-            gh release create v1.0.0 artifacts\DK-Arrow-Ez-Drawing-Tool-v1.0.0-win-x64.zip artifacts\DK-Arrow-Ez-Drawing-Tool-v1.0.0-source.zip --title "DK Arrow Ez Drawing Tool v1.0.0" --notes-file RELEASE_NOTES.md
+            gh release create $tag $binary $source --target "$env:GITHUB_SHA" --title "DK Arrow Ez Drawing Tool $tag" --notes-file RELEASE_NOTES.md
           }
