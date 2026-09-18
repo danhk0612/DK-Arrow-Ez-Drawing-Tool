@@ -17,18 +17,32 @@
             <RowDefinition Height="*"/>
         </Grid.RowDefinitions>
 
-        <Border Grid.Row="0" Background="White" BorderBrush="#D9DDE3" BorderThickness="0,0,0,1" Padding="12,10">
+        <Border Grid.Row="0" Background="White" BorderBrush="#D9DDE3" BorderThickness="0,0,0,1" Padding="10,8">
             <DockPanel LastChildFill="False">
                 <StackPanel Orientation="Horizontal" DockPanel.Dock="Left">
-                    <Button x:Name="OpenBackgroundButton" Content="배경 이미지 열기" Click="OpenBackgroundButton_Click" Margin="0,0,8,0" Padding="14,7"/>
-                    <Button x:Name="NewArrowButton" Content="새 화살표" Click="NewArrowButton_Click" Margin="0,0,8,0" Padding="14,7"/>
-                    <Button x:Name="SaveProjectButton" Content="작업 저장" Click="SaveProjectButton_Click" Margin="0,0,8,0" Padding="14,7"/>
-                    <Button x:Name="LoadProjectButton" Content="작업 불러오기" Click="LoadProjectButton_Click" Margin="0,0,8,0" Padding="14,7"/>
-                    <Button x:Name="ExportButton" Content="PNG 출력" Click="ExportButton_Click" Padding="14,7"/>
-                    <CheckBox x:Name="IncludeBackgroundCheckBox" Content="배경 포함" VerticalAlignment="Center" Margin="12,0,0,0"/>
+                    <Border Background="#F8F9FB" BorderBrush="#E2E6EB" BorderThickness="1" CornerRadius="5" Padding="4" Margin="0,0,8,0">
+                        <Button x:Name="OpenBackgroundButton" Content="배경 이미지 열기" Click="OpenBackgroundButton_Click" Padding="12,6"/>
+                    </Border>
+                    <Border Background="#F8F9FB" BorderBrush="#E2E6EB" BorderThickness="1" CornerRadius="5" Padding="4" Margin="0,0,8,0">
+                        <Button x:Name="NewArrowButton" Content="새 화살표" Click="NewArrowButton_Click" Padding="12,6"/>
+                    </Border>
+                    <Border Background="#F8F9FB" BorderBrush="#E2E6EB" BorderThickness="1" CornerRadius="5" Padding="4" Margin="0,0,8,0">
+                        <StackPanel Orientation="Horizontal">
+                            <Button x:Name="SaveProjectButton" Content="작업 저장" Click="SaveProjectButton_Click" Margin="0,0,4,0" Padding="11,6"/>
+                            <Button x:Name="LoadProjectButton" Content="작업 불러오기" Click="LoadProjectButton_Click" Padding="11,6"/>
+                        </StackPanel>
+                    </Border>
+                    <Border Background="#F8F9FB" BorderBrush="#E2E6EB" BorderThickness="1" CornerRadius="5" Padding="6,4">
+                        <StackPanel Orientation="Horizontal" VerticalAlignment="Center">
+                            <TextBlock Text="접미어" VerticalAlignment="Center" Foreground="#555F6D" Margin="2,0,6,0"/>
+                            <TextBox x:Name="ExportSuffixTextBox" Width="82" Padding="6,5" VerticalContentAlignment="Center" TextChanged="ExportSuffixTextBox_TextChanged" ToolTip="PNG 파일명에 붙일 접미어"/>
+                            <Button x:Name="ExportButton" Content="PNG 출력" Click="ExportButton_Click" Margin="6,0,0,0" Padding="11,6"/>
+                            <CheckBox x:Name="IncludeBackgroundCheckBox" Content="배경 포함" VerticalAlignment="Center" Margin="8,0,2,0"/>
+                        </StackPanel>
+                    </Border>
                 </StackPanel>
-                <StackPanel Orientation="Horizontal" DockPanel.Dock="Right" VerticalAlignment="Center" Margin="18,0,0,0">
-                    <TextBlock x:Name="StatusText" VerticalAlignment="Center" Foreground="#555F6D" Margin="0,0,10,0"/>
+                <StackPanel Orientation="Horizontal" DockPanel.Dock="Right" VerticalAlignment="Center" Margin="14,0,0,0">
+                    <TextBlock x:Name="StatusText" MaxWidth="250" TextTrimming="CharacterEllipsis" VerticalAlignment="Center" Foreground="#555F6D" Margin="0,0,10,0"/>
                     <Button x:Name="HelpButton" Content="?" Click="HelpButton_Click" Width="32" Height="32" FontSize="16" FontWeight="SemiBold" Padding="0" ToolTip="사용 설명"/>
                 </StackPanel>
             </DockPanel>
@@ -93,11 +107,21 @@
                         <TextBox x:Name="NameTextBox" Margin="0,5,0,14" Padding="7,5" TextChanged="NameTextBox_TextChanged"/>
 
                         <TextBlock Text="색상" Foreground="#555F6D"/>
-                        <DockPanel Margin="0,5,0,14">
+                        <DockPanel Margin="0,5,0,8">
                             <Border x:Name="ColorPreview" Width="34" Height="30" BorderBrush="#B9BFC8" BorderThickness="1" Margin="0,0,8,0"/>
                             <TextBox x:Name="ColorHexTextBox" Width="120" Padding="7,5" TextChanged="ColorHexTextBox_TextChanged"/>
                             <Button x:Name="ChooseColorButton" Content="색 선택" Click="ChooseColorButton_Click" Margin="8,0,0,0" Padding="10,5"/>
                         </DockPanel>
+                        <WrapPanel x:Name="ColorPresetPanel" Margin="0,0,0,14">
+                            <Button Width="28" Height="28" Margin="0,0,5,0" Padding="3" Tag="#FF0000" Click="ColorPresetButton_Click" ToolTip="#FF0000"><Border Background="#FF0000" CornerRadius="2"/></Button>
+                            <Button Width="28" Height="28" Margin="0,0,5,0" Padding="3" Tag="#FF7A00" Click="ColorPresetButton_Click" ToolTip="#FF7A00"><Border Background="#FF7A00" CornerRadius="2"/></Button>
+                            <Button Width="28" Height="28" Margin="0,0,5,0" Padding="3" Tag="#FFD400" Click="ColorPresetButton_Click" ToolTip="#FFD400"><Border Background="#FFD400" CornerRadius="2"/></Button>
+                            <Button Width="28" Height="28" Margin="0,0,5,0" Padding="3" Tag="#00A651" Click="ColorPresetButton_Click" ToolTip="#00A651"><Border Background="#00A651" CornerRadius="2"/></Button>
+                            <Button Width="28" Height="28" Margin="0,0,5,0" Padding="3" Tag="#0078D4" Click="ColorPresetButton_Click" ToolTip="#0078D4"><Border Background="#0078D4" CornerRadius="2"/></Button>
+                            <Button Width="28" Height="28" Margin="0,0,5,0" Padding="3" Tag="#00B7C3" Click="ColorPresetButton_Click" ToolTip="#00B7C3"><Border Background="#00B7C3" CornerRadius="2"/></Button>
+                            <Button Width="28" Height="28" Margin="0,0,5,0" Padding="3" Tag="#8E44AD" Click="ColorPresetButton_Click" ToolTip="#8E44AD"><Border Background="#8E44AD" CornerRadius="2"/></Button>
+                            <Button Width="28" Height="28" Padding="3" Tag="#000000" Click="ColorPresetButton_Click" ToolTip="#000000"><Border Background="#000000" CornerRadius="2"/></Button>
+                        </WrapPanel>
 
                         <TextBlock Text="선 두께" Foreground="#555F6D"/>
                         <Grid Margin="0,5,0,14">
@@ -124,7 +148,7 @@
                         <Button x:Name="HelpCloseButton" Content="×" Click="HelpCloseButton_Click" DockPanel.Dock="Right" Width="32" Height="32" FontSize="20" Padding="0"/>
                         <StackPanel>
                             <TextBlock Text="DK Arrow Ez Drawing Tool" FontSize="22" FontWeight="SemiBold"/>
-                            <TextBlock Text="사용 설명 · v1.0.0" Foreground="#667085" Margin="0,4,0,0"/>
+                            <TextBlock Text="사용 설명 · v1.0.1" Foreground="#667085" Margin="0,4,0,0"/>
                         </StackPanel>
                     </DockPanel>
                     <ScrollViewer Grid.Row="1" VerticalScrollBarVisibility="Auto">
@@ -133,10 +157,10 @@
                             <TextBlock Text="배경 이미지 열기를 누르거나 이미지 파일을 창으로 드래그하세요. 배경은 참고용이며 PNG 출력 시 포함 여부를 선택할 수 있습니다." TextWrapping="Wrap" LineHeight="20"/>
 
                             <TextBlock Text="화살표 그리기" FontSize="16" FontWeight="SemiBold" Margin="0,16,0,6"/>
-                            <TextBlock Text="새 화살표 → 왼쪽 클릭으로 점 추가 → 오른쪽 클릭 또는 Enter로 완료합니다. Esc는 작성을 취소합니다. Shift를 누른 채 점을 추가하면 이전 점 기준으로 수평/수직 방향에 고정됩니다." TextWrapping="Wrap" LineHeight="20"/>
+                            <TextBlock Text="새 화살표 → 왼쪽 클릭으로 점 추가 → 오른쪽 클릭 또는 Enter로 완료합니다. Esc는 작성을 취소합니다. Shift를 누른 채 점을 추가하면 이전 점 기준으로 수평/수직 방향에 고정됩니다. 새 화살표는 직전에 새로 만든 화살표의 색상과 선 두께를 이어받으며 이 값은 프로그램을 다시 실행해도 유지됩니다." TextWrapping="Wrap" LineHeight="20"/>
 
                             <TextBlock Text="선택 및 수정" FontSize="16" FontWeight="SemiBold" Margin="0,16,0,6"/>
-                            <TextBlock Text="화살표를 클릭하거나 목록에서 선택합니다. Ctrl/Shift로 여러 화살표를 선택하면 색상·선 두께를 한 번에 바꾸거나 삭제할 수 있습니다. 화살표 하나를 선택하면 경로 점이 표시되며 점을 드래그해 수정할 수 있습니다." TextWrapping="Wrap" LineHeight="20"/>
+                            <TextBlock Text="화살표를 클릭하거나 목록에서 선택합니다. Ctrl/Shift로 여러 화살표를 선택하면 색상·선 두께를 한 번에 바꾸거나 삭제할 수 있습니다. 자주 쓰는 색은 색상 아래 템플릿 버튼으로 바로 지정할 수 있습니다. 화살표 하나를 선택하면 경로 점이 표시되며 점을 드래그해 수정할 수 있습니다." TextWrapping="Wrap" LineHeight="20"/>
 
                             <TextBlock Text="정밀 이동" FontSize="16" FontWeight="SemiBold" Margin="0,16,0,6"/>
                             <TextBlock Text="선택한 화살표 또는 선택한 경로 점은 방향키로 1px씩 이동합니다. Shift+방향키는 10px씩 이동합니다." TextWrapping="Wrap" LineHeight="20"/>
@@ -148,7 +172,7 @@
                             <TextBlock Text="작업 저장은 배경 이미지와 화살표 데이터를 .arrowproj 파일 하나에 보관합니다. 나중에 작업 불러오기로 그대로 이어서 편집할 수 있습니다." TextWrapping="Wrap" LineHeight="20"/>
 
                             <TextBlock Text="PNG 출력" FontSize="16" FontWeight="SemiBold" Margin="0,16,0,6"/>
-                            <TextBlock Text="배경 포함을 끄면 투명 배경에 화살표만 출력됩니다. 켜면 참고 이미지와 화살표가 합쳐진 PNG를 만듭니다." TextWrapping="Wrap" LineHeight="20"/>
+                            <TextBlock Text="상단 접미어 입력값이 PNG 파일명에 사용됩니다. 기본값은 _arrows이며 변경한 값은 프로그램을 다시 실행해도 유지됩니다. 배경 포함을 끄면 투명 배경에 화살표만 출력되고, 켜면 접미어 뒤에 _bg가 추가되어 참고 이미지와 화살표가 합쳐진 PNG를 만듭니다." TextWrapping="Wrap" LineHeight="20"/>
                         </StackPanel>
                     </ScrollViewer>
                 </Grid>
