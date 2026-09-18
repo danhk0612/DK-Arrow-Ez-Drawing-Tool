@@ -1,0 +1,158 @@
+<Window x:Class="ArrowOverlayTool.MainWindow"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        Title="DK Arrow Ez Drawing Tool"
+        Icon="Assets/AppIcon.ico"
+        Width="1280" Height="820"
+        MinWidth="980" MinHeight="640"
+        WindowStartupLocation="CenterScreen"
+        Background="#F4F5F7"
+        AllowDrop="True"
+        PreviewDragOver="Window_PreviewDragOver"
+        PreviewDrop="Window_PreviewDrop"
+        PreviewKeyDown="Window_PreviewKeyDown">
+    <Grid>
+        <Grid.RowDefinitions>
+            <RowDefinition Height="Auto"/>
+            <RowDefinition Height="*"/>
+        </Grid.RowDefinitions>
+
+        <Border Grid.Row="0" Background="White" BorderBrush="#D9DDE3" BorderThickness="0,0,0,1" Padding="12,10">
+            <DockPanel LastChildFill="False">
+                <StackPanel Orientation="Horizontal" DockPanel.Dock="Left">
+                    <Button x:Name="OpenBackgroundButton" Content="배경 이미지 열기" Click="OpenBackgroundButton_Click" Margin="0,0,8,0" Padding="14,7"/>
+                    <Button x:Name="NewArrowButton" Content="새 화살표" Click="NewArrowButton_Click" Margin="0,0,8,0" Padding="14,7"/>
+                    <Button x:Name="SaveProjectButton" Content="작업 저장" Click="SaveProjectButton_Click" Margin="0,0,8,0" Padding="14,7"/>
+                    <Button x:Name="LoadProjectButton" Content="작업 불러오기" Click="LoadProjectButton_Click" Margin="0,0,8,0" Padding="14,7"/>
+                    <Button x:Name="ExportButton" Content="PNG 출력" Click="ExportButton_Click" Padding="14,7"/>
+                    <CheckBox x:Name="IncludeBackgroundCheckBox" Content="배경 포함" VerticalAlignment="Center" Margin="12,0,0,0"/>
+                </StackPanel>
+                <StackPanel Orientation="Horizontal" DockPanel.Dock="Right" VerticalAlignment="Center" Margin="18,0,0,0">
+                    <TextBlock x:Name="StatusText" VerticalAlignment="Center" Foreground="#555F6D" Margin="0,0,10,0"/>
+                    <Button x:Name="HelpButton" Content="?" Click="HelpButton_Click" Width="32" Height="32" FontSize="16" FontWeight="SemiBold" Padding="0" ToolTip="사용 설명"/>
+                </StackPanel>
+            </DockPanel>
+        </Border>
+
+        <Grid Grid.Row="1">
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="*"/>
+                <ColumnDefinition Width="320"/>
+            </Grid.ColumnDefinitions>
+
+            <Border x:Name="ViewportBorder"
+                    Grid.Column="0"
+                    Margin="12"
+                    Background="#2C3036"
+                    CornerRadius="6"
+                    ClipToBounds="True"
+                    PreviewMouseWheel="ViewportBorder_PreviewMouseWheel"
+                    PreviewMouseDown="ViewportBorder_PreviewMouseDown"
+                    PreviewMouseUp="ViewportBorder_PreviewMouseUp"
+                    PreviewMouseMove="ViewportBorder_PreviewMouseMove"
+                    SizeChanged="ViewportBorder_SizeChanged">
+                <Canvas Background="#2C3036">
+                    <Grid x:Name="CanvasHost"
+                          RenderTransformOrigin="0,0">
+                        <Image x:Name="BackgroundImage" Stretch="Fill" IsHitTestVisible="False"/>
+                        <Canvas x:Name="DrawingCanvas"
+                                Background="Transparent"
+                                Focusable="True"
+                                MouseLeftButtonDown="DrawingCanvas_MouseLeftButtonDown"
+                                MouseLeftButtonUp="DrawingCanvas_MouseLeftButtonUp"
+                                MouseRightButtonDown="DrawingCanvas_MouseRightButtonDown"
+                                MouseMove="DrawingCanvas_MouseMove"
+                                KeyDown="DrawingCanvas_KeyDown"/>
+                    </Grid>
+                </Canvas>
+            </Border>
+
+            <Border Grid.Column="1" Background="White" BorderBrush="#D9DDE3" BorderThickness="1,0,0,0">
+                <Grid Margin="16">
+                    <Grid.RowDefinitions>
+                        <RowDefinition Height="Auto"/>
+                        <RowDefinition Height="220"/>
+                        <RowDefinition Height="Auto"/>
+                        <RowDefinition Height="*"/>
+                    </Grid.RowDefinitions>
+
+                    <TextBlock Grid.Row="0" Text="화살표 목록" FontSize="18" FontWeight="SemiBold" Margin="0,0,0,10"/>
+                    <ListBox x:Name="ArrowList" Grid.Row="1" SelectionMode="Extended" SelectionChanged="ArrowList_SelectionChanged" DisplayMemberPath="DisplayText"/>
+
+                    <Grid Grid.Row="2" Margin="0,16,0,0">
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="*"/>
+                            <ColumnDefinition Width="Auto"/>
+                        </Grid.ColumnDefinitions>
+                        <TextBlock Text="선택 화살표 속성" FontSize="16" FontWeight="SemiBold" VerticalAlignment="Center"/>
+                        <Button x:Name="DeleteArrowButton" Grid.Column="1" Content="삭제" Click="DeleteArrowButton_Click" Padding="11,5"/>
+                    </Grid>
+
+                    <StackPanel Grid.Row="3" Margin="0,12,0,0">
+                        <TextBlock Text="이름" Foreground="#555F6D"/>
+                        <TextBox x:Name="NameTextBox" Margin="0,5,0,14" Padding="7,5" TextChanged="NameTextBox_TextChanged"/>
+
+                        <TextBlock Text="색상" Foreground="#555F6D"/>
+                        <DockPanel Margin="0,5,0,14">
+                            <Border x:Name="ColorPreview" Width="34" Height="30" BorderBrush="#B9BFC8" BorderThickness="1" Margin="0,0,8,0"/>
+                            <TextBox x:Name="ColorHexTextBox" Width="120" Padding="7,5" TextChanged="ColorHexTextBox_TextChanged"/>
+                            <Button x:Name="ChooseColorButton" Content="색 선택" Click="ChooseColorButton_Click" Margin="8,0,0,0" Padding="10,5"/>
+                        </DockPanel>
+
+                        <TextBlock Text="선 두께" Foreground="#555F6D"/>
+                        <Grid Margin="0,5,0,14">
+                            <Grid.ColumnDefinitions>
+                                <ColumnDefinition Width="*"/>
+                                <ColumnDefinition Width="62"/>
+                            </Grid.ColumnDefinitions>
+                            <Slider x:Name="ThicknessSlider" Minimum="1" Maximum="30" TickFrequency="1" ValueChanged="ThicknessSlider_ValueChanged"/>
+                            <TextBox x:Name="ThicknessTextBox" Grid.Column="1" Margin="8,0,0,0" Padding="6,3" TextAlignment="Center" TextChanged="ThicknessTextBox_TextChanged"/>
+                        </Grid>
+                    </StackPanel>
+                </Grid>
+            </Border>
+        </Grid>
+
+        <Grid x:Name="HelpOverlay" Grid.RowSpan="2" Visibility="Collapsed" Background="#99000000" Panel.ZIndex="10000" MouseLeftButtonDown="HelpOverlay_MouseLeftButtonDown">
+            <Border Width="620" MaxHeight="680" Padding="24" Background="White" CornerRadius="10" HorizontalAlignment="Center" VerticalAlignment="Center">
+                <Grid>
+                    <Grid.RowDefinitions>
+                        <RowDefinition Height="Auto"/>
+                        <RowDefinition Height="*"/>
+                    </Grid.RowDefinitions>
+                    <DockPanel Grid.Row="0" Margin="0,0,0,16">
+                        <Button x:Name="HelpCloseButton" Content="×" Click="HelpCloseButton_Click" DockPanel.Dock="Right" Width="32" Height="32" FontSize="20" Padding="0"/>
+                        <StackPanel>
+                            <TextBlock Text="DK Arrow Ez Drawing Tool" FontSize="22" FontWeight="SemiBold"/>
+                            <TextBlock Text="사용 설명 · v1.0.0" Foreground="#667085" Margin="0,4,0,0"/>
+                        </StackPanel>
+                    </DockPanel>
+                    <ScrollViewer Grid.Row="1" VerticalScrollBarVisibility="Auto">
+                        <StackPanel Margin="0,0,8,0">
+                            <TextBlock Text="시작" FontSize="16" FontWeight="SemiBold" Margin="0,0,0,6"/>
+                            <TextBlock Text="배경 이미지 열기를 누르거나 이미지 파일을 창으로 드래그하세요. 배경은 참고용이며 PNG 출력 시 포함 여부를 선택할 수 있습니다." TextWrapping="Wrap" LineHeight="20"/>
+
+                            <TextBlock Text="화살표 그리기" FontSize="16" FontWeight="SemiBold" Margin="0,16,0,6"/>
+                            <TextBlock Text="새 화살표 → 왼쪽 클릭으로 점 추가 → 오른쪽 클릭 또는 Enter로 완료합니다. Esc는 작성을 취소합니다. Shift를 누른 채 점을 추가하면 이전 점 기준으로 수평/수직 방향에 고정됩니다." TextWrapping="Wrap" LineHeight="20"/>
+
+                            <TextBlock Text="선택 및 수정" FontSize="16" FontWeight="SemiBold" Margin="0,16,0,6"/>
+                            <TextBlock Text="화살표를 클릭하거나 목록에서 선택합니다. Ctrl/Shift로 여러 화살표를 선택하면 색상·선 두께를 한 번에 바꾸거나 삭제할 수 있습니다. 화살표 하나를 선택하면 경로 점이 표시되며 점을 드래그해 수정할 수 있습니다." TextWrapping="Wrap" LineHeight="20"/>
+
+                            <TextBlock Text="정밀 이동" FontSize="16" FontWeight="SemiBold" Margin="0,16,0,6"/>
+                            <TextBlock Text="선택한 화살표 또는 선택한 경로 점은 방향키로 1px씩 이동합니다. Shift+방향키는 10px씩 이동합니다." TextWrapping="Wrap" LineHeight="20"/>
+
+                            <TextBlock Text="화면 이동" FontSize="16" FontWeight="SemiBold" Margin="0,16,0,6"/>
+                            <TextBlock Text="마우스 휠로 확대/축소하고, 가운데 버튼을 누른 채 드래그하여 팬합니다. 작업 영역을 더블클릭하면 화면 맞춤 상태로 돌아갑니다." TextWrapping="Wrap" LineHeight="20"/>
+
+                            <TextBlock Text="작업 저장 / 불러오기" FontSize="16" FontWeight="SemiBold" Margin="0,16,0,6"/>
+                            <TextBlock Text="작업 저장은 배경 이미지와 화살표 데이터를 .arrowproj 파일 하나에 보관합니다. 나중에 작업 불러오기로 그대로 이어서 편집할 수 있습니다." TextWrapping="Wrap" LineHeight="20"/>
+
+                            <TextBlock Text="PNG 출력" FontSize="16" FontWeight="SemiBold" Margin="0,16,0,6"/>
+                            <TextBlock Text="배경 포함을 끄면 투명 배경에 화살표만 출력됩니다. 켜면 참고 이미지와 화살표가 합쳐진 PNG를 만듭니다." TextWrapping="Wrap" LineHeight="20"/>
+                        </StackPanel>
+                    </ScrollViewer>
+                </Grid>
+            </Border>
+        </Grid>
+    </Grid>
+</Window>
