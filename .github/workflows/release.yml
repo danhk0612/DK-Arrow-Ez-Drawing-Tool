@@ -19,7 +19,8 @@ jobs:
         id: source
         shell: pwsh
         run: |
-          if (Test-Path "source/DK-Arrow-Ez-Drawing-Tool-v1.0.0-source.zip.b64") {
+          $parts = Get-ChildItem "source/parts/part*.txt" -ErrorAction SilentlyContinue | Sort-Object Name
+          if ($parts.Count -eq 9) {
             "ready=true" >> $env:GITHUB_OUTPUT
           } else {
             "ready=false" >> $env:GITHUB_OUTPUT
@@ -29,10 +30,11 @@ jobs:
         if: steps.source.outputs.ready == 'true'
         shell: pwsh
         run: |
-          $b64Path = "source/DK-Arrow-Ez-Drawing-Tool-v1.0.0-source.zip.b64"
+          $partFiles = Get-ChildItem "source/parts/part*.txt" | Sort-Object Name
+          $base64 = ($partFiles | ForEach-Object { Get-Content $_.FullName -Raw }) -join ""
           $zipPath = Join-Path $env:RUNNER_TEMP "DK-Arrow-Ez-Drawing-Tool-v1.0.0-source.zip"
           $extractPath = Join-Path $env:RUNNER_TEMP "dkarrow-source"
-          [IO.File]::WriteAllBytes($zipPath, [Convert]::FromBase64String((Get-Content $b64Path -Raw)))
+          [IO.File]::WriteAllBytes($zipPath, [Convert]::FromBase64String($base64))
           Expand-Archive -Path $zipPath -DestinationPath $extractPath -Force
           Copy-Item (Join-Path $extractPath "ArrowOverlayTool\*") "." -Recurse -Force
           Remove-Item "source" -Recurse -Force
