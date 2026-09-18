@@ -44,12 +44,13 @@ public partial class MainWindow : Window
         var arrow = new ArrowItem
         {
             Name = $"화살표 {_arrowCounter++}",
-            ColorHex = "#FF0000",
-            Thickness = 6,
+            ColorHex = _settings.LastArrowColorHex,
+            Thickness = _settings.LastArrowThickness,
             Points = _draftPoints.Select(p => new PointData { X = p.X, Y = p.Y }).ToList()
         };
 
         _arrows.Add(arrow);
+        _lastCreatedArrowId = arrow.Id;
         ClearDraft();
         _isDrawing = false;
         DrawingCanvas.Cursor = WpfCursors.Arrow;
