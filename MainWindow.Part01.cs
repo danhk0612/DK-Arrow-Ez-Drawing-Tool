@@ -50,6 +50,14 @@ public partial class MainWindow : Window
 
     private ArrowItem? _selectedArrow;
 
+    private AppSettings _settings = new();
+    private Guid? _lastCreatedArrowId;
+    private bool _updatingSettingsUi;
+    private readonly string _settingsPath = IoPath.Combine(
+        Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData),
+        "DK Arrow Ez Drawing Tool",
+        "settings.json");
+
     private bool _isDrawing;
 
     private bool _updatingEditor;
@@ -102,6 +110,10 @@ public partial class MainWindow : Window
         InitializeComponent();
         ArrowList.ItemsSource = _arrows;
         CanvasHost.RenderTransform = _viewTransform;
+        LoadAppSettings();
+        _updatingSettingsUi = true;
+        ExportSuffixTextBox.Text = _settings.ExportSuffix;
+        _updatingSettingsUi = false;
         SetEditorEnabled(false);
         SetStatus("배경 이미지를 열어 시작하세요.");
     }
