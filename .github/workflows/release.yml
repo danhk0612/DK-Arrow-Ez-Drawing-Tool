@@ -36,6 +36,8 @@ jobs:
           $extractPath = Join-Path $env:RUNNER_TEMP "dkarrow-source"
           [IO.File]::WriteAllBytes($zipPath, [Convert]::FromBase64String($base64))
           Expand-Archive -Path $zipPath -DestinationPath $extractPath -Force
+          Get-ChildItem "MainWindow.Part*.cs" -ErrorAction SilentlyContinue | Remove-Item -Force
+          if (Test-Path "Assets") { Remove-Item "Assets" -Recurse -Force }
           Copy-Item (Join-Path $extractPath "ArrowOverlayTool\*") "." -Recurse -Force
           Remove-Item "source" -Recurse -Force
 
