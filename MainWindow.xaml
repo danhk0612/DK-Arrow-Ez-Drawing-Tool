@@ -112,15 +112,19 @@
                             <TextBox x:Name="ColorHexTextBox" Width="120" Padding="7,5" TextChanged="ColorHexTextBox_TextChanged"/>
                             <Button x:Name="ChooseColorButton" Content="색 선택" Click="ChooseColorButton_Click" Margin="8,0,0,0" Padding="10,5"/>
                         </DockPanel>
+                        <DockPanel Margin="0,0,0,5">
+                            <TextBlock Text="색상 템플릿" Foreground="#555F6D"/>
+                            <TextBlock Text="좌클릭 적용 · 우클릭 수정" DockPanel.Dock="Right" Foreground="#8A94A3" FontSize="11"/>
+                        </DockPanel>
                         <WrapPanel x:Name="ColorPresetPanel" Margin="0,0,0,14">
-                            <Button Width="28" Height="28" Margin="0,0,5,0" Padding="3" Tag="#FF0000" Click="ColorPresetButton_Click" ToolTip="#FF0000"><Border Background="#FF0000" CornerRadius="2"/></Button>
-                            <Button Width="28" Height="28" Margin="0,0,5,0" Padding="3" Tag="#FF7A00" Click="ColorPresetButton_Click" ToolTip="#FF7A00"><Border Background="#FF7A00" CornerRadius="2"/></Button>
-                            <Button Width="28" Height="28" Margin="0,0,5,0" Padding="3" Tag="#FFD400" Click="ColorPresetButton_Click" ToolTip="#FFD400"><Border Background="#FFD400" CornerRadius="2"/></Button>
-                            <Button Width="28" Height="28" Margin="0,0,5,0" Padding="3" Tag="#00A651" Click="ColorPresetButton_Click" ToolTip="#00A651"><Border Background="#00A651" CornerRadius="2"/></Button>
-                            <Button Width="28" Height="28" Margin="0,0,5,0" Padding="3" Tag="#0078D4" Click="ColorPresetButton_Click" ToolTip="#0078D4"><Border Background="#0078D4" CornerRadius="2"/></Button>
-                            <Button Width="28" Height="28" Margin="0,0,5,0" Padding="3" Tag="#00B7C3" Click="ColorPresetButton_Click" ToolTip="#00B7C3"><Border Background="#00B7C3" CornerRadius="2"/></Button>
-                            <Button Width="28" Height="28" Margin="0,0,5,0" Padding="3" Tag="#8E44AD" Click="ColorPresetButton_Click" ToolTip="#8E44AD"><Border Background="#8E44AD" CornerRadius="2"/></Button>
-                            <Button Width="28" Height="28" Padding="3" Tag="#000000" Click="ColorPresetButton_Click" ToolTip="#000000"><Border Background="#000000" CornerRadius="2"/></Button>
+                            <Button Width="30" Height="30" Margin="0,0,5,0" Padding="3" Tag="0" Click="ColorPresetButton_Click" PreviewMouseRightButtonDown="ColorPresetButton_PreviewMouseRightButtonDown"><Border Width="20" Height="20" Background="#FF0000" BorderBrush="#8A94A3" BorderThickness="1" CornerRadius="2"/></Button>
+                            <Button Width="30" Height="30" Margin="0,0,5,0" Padding="3" Tag="1" Click="ColorPresetButton_Click" PreviewMouseRightButtonDown="ColorPresetButton_PreviewMouseRightButtonDown"><Border Width="20" Height="20" Background="#FF7A00" BorderBrush="#8A94A3" BorderThickness="1" CornerRadius="2"/></Button>
+                            <Button Width="30" Height="30" Margin="0,0,5,0" Padding="3" Tag="2" Click="ColorPresetButton_Click" PreviewMouseRightButtonDown="ColorPresetButton_PreviewMouseRightButtonDown"><Border Width="20" Height="20" Background="#FFD400" BorderBrush="#8A94A3" BorderThickness="1" CornerRadius="2"/></Button>
+                            <Button Width="30" Height="30" Margin="0,0,5,0" Padding="3" Tag="3" Click="ColorPresetButton_Click" PreviewMouseRightButtonDown="ColorPresetButton_PreviewMouseRightButtonDown"><Border Width="20" Height="20" Background="#00A651" BorderBrush="#8A94A3" BorderThickness="1" CornerRadius="2"/></Button>
+                            <Button Width="30" Height="30" Margin="0,0,5,0" Padding="3" Tag="4" Click="ColorPresetButton_Click" PreviewMouseRightButtonDown="ColorPresetButton_PreviewMouseRightButtonDown"><Border Width="20" Height="20" Background="#0078D4" BorderBrush="#8A94A3" BorderThickness="1" CornerRadius="2"/></Button>
+                            <Button Width="30" Height="30" Margin="0,0,5,0" Padding="3" Tag="5" Click="ColorPresetButton_Click" PreviewMouseRightButtonDown="ColorPresetButton_PreviewMouseRightButtonDown"><Border Width="20" Height="20" Background="#00B7C3" BorderBrush="#8A94A3" BorderThickness="1" CornerRadius="2"/></Button>
+                            <Button Width="30" Height="30" Margin="0,0,5,0" Padding="3" Tag="6" Click="ColorPresetButton_Click" PreviewMouseRightButtonDown="ColorPresetButton_PreviewMouseRightButtonDown"><Border Width="20" Height="20" Background="#8E44AD" BorderBrush="#8A94A3" BorderThickness="1" CornerRadius="2"/></Button>
+                            <Button Width="30" Height="30" Padding="3" Tag="7" Click="ColorPresetButton_Click" PreviewMouseRightButtonDown="ColorPresetButton_PreviewMouseRightButtonDown"><Border Width="20" Height="20" Background="#000000" BorderBrush="#8A94A3" BorderThickness="1" CornerRadius="2"/></Button>
                         </WrapPanel>
 
                         <TextBlock Text="선 두께" Foreground="#555F6D"/>
@@ -148,7 +152,7 @@
                         <Button x:Name="HelpCloseButton" Content="×" Click="HelpCloseButton_Click" DockPanel.Dock="Right" Width="32" Height="32" FontSize="20" Padding="0"/>
                         <StackPanel>
                             <TextBlock Text="DK Arrow Ez Drawing Tool" FontSize="22" FontWeight="SemiBold"/>
-                            <TextBlock Text="사용 설명 · v1.0.1" Foreground="#667085" Margin="0,4,0,0"/>
+                            <TextBlock Text="사용 설명 · v1.0.2" Foreground="#667085" Margin="0,4,0,0"/>
                         </StackPanel>
                     </DockPanel>
                     <ScrollViewer Grid.Row="1" VerticalScrollBarVisibility="Auto">
@@ -160,7 +164,7 @@
                             <TextBlock Text="새 화살표 → 왼쪽 클릭으로 점 추가 → 오른쪽 클릭 또는 Enter로 완료합니다. Esc는 작성을 취소합니다. Shift를 누른 채 점을 추가하면 이전 점 기준으로 수평/수직 방향에 고정됩니다. 새 화살표는 직전에 새로 만든 화살표의 색상과 선 두께를 이어받으며 이 값은 프로그램을 다시 실행해도 유지됩니다." TextWrapping="Wrap" LineHeight="20"/>
 
                             <TextBlock Text="선택 및 수정" FontSize="16" FontWeight="SemiBold" Margin="0,16,0,6"/>
-                            <TextBlock Text="화살표를 클릭하거나 목록에서 선택합니다. Ctrl/Shift로 여러 화살표를 선택하면 색상·선 두께를 한 번에 바꾸거나 삭제할 수 있습니다. 자주 쓰는 색은 색상 아래 템플릿 버튼으로 바로 지정할 수 있습니다. 화살표 하나를 선택하면 경로 점이 표시되며 점을 드래그해 수정할 수 있습니다." TextWrapping="Wrap" LineHeight="20"/>
+                            <TextBlock Text="화살표를 클릭하거나 목록에서 선택합니다. Ctrl/Shift로 여러 화살표를 선택하면 색상·선 두께를 한 번에 바꾸거나 삭제할 수 있습니다. 색상 템플릿은 좌클릭으로 적용하고, 우클릭하면 해당 칸의 색상을 원하는 값으로 변경할 수 있습니다. 변경한 템플릿은 프로그램을 다시 실행해도 유지됩니다." TextWrapping="Wrap" LineHeight="20"/>
 
                             <TextBlock Text="정밀 이동" FontSize="16" FontWeight="SemiBold" Margin="0,16,0,6"/>
                             <TextBlock Text="선택한 화살표 또는 선택한 경로 점은 방향키로 1px씩 이동합니다. Shift+방향키는 10px씩 이동합니다." TextWrapping="Wrap" LineHeight="20"/>

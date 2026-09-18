@@ -229,10 +229,52 @@ public partial class MainWindow : Window
 
     private void ColorPresetButton_Click(object sender, RoutedEventArgs e)
     {
-        if (sender is not System.Windows.Controls.Button { Tag: string hex })
+        if (!TryGetColorPresetIndex(sender, out var index))
             return;
 
+        var hex = _settings.ColorPresets[index];
+        var selected = GetSelectedArrows();
+
+        if (selected.Count == 0)
+        {
+            _settings.LastArrowColorHex = hex;
+            SaveAppSettings();
+            SetStatus($"새 화살표 기본 색상을 {hex}(으)로 지정했습니다.");
+            return;
+        }
+
         ColorHexTextBox.Text = hex;
+    }
+
+    private void ColorPresetButton_PreviewMouseRightButtonDown(object sender, WpfMouseButtonEventArgs e)
+    {
+        if (!TryGetColorPresetIndex(sender, out var index))
+            return;
+
+        var current = (WpfColor)WpfColorConverter.ConvertFromString(_settings.ColorPresets[index]);
+        using var dialog = new WinForms.ColorDialog
+        {
+            FullOpen = true,
+            Color = System.Drawing.Color.FromArgb(current.A, current.R, current.G, current.B)
+        };
+
+        if (dialog.ShowDialog() != WinForms.DialogResult.OK)
+            return;
+
+        var color = dialog.Color;
+        _settings.ColorPresets[index] = $"#{color.R:X2}{color.G:X2}{color.B:X2}";
+        SaveAppSettings();
+        RefreshColorPresetButtons();
+        SetStatus($"색상 템플릿 {index + 1}을(를) {_settings.ColorPresets[index]}(으)로 변경했습니다.");
+        e.Handled = true;
+    }
+
+    private static bool TryGetColorPresetIndex(object sender, out int index)
+    {
+        index = -1;
+        return sender is System.Windows.Controls.Button { Tag: string value }
+            && int.TryParse(value, out index)
+            && index is >= 0 and < 8;
     }
 
     private void ChooseColorButton_Click(object sender, RoutedEventArgs e)

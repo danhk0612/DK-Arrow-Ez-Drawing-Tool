@@ -181,7 +181,7 @@ public partial class MainWindow : Window
         NameTextBox.IsEnabled = enabled;
         ColorHexTextBox.IsEnabled = enabled;
         ChooseColorButton.IsEnabled = enabled;
-        ColorPresetPanel.IsEnabled = enabled;
+        ColorPresetPanel.IsEnabled = true;
         ThicknessSlider.IsEnabled = enabled;
         ThicknessTextBox.IsEnabled = enabled;
         DeleteArrowButton.IsEnabled = enabled;
@@ -221,11 +221,36 @@ public partial class MainWindow : Window
             loaded.LastArrowColorHex = color ?? "#FF0000";
             loaded.LastArrowThickness = Math.Clamp(loaded.LastArrowThickness, 1, 30);
             loaded.ExportSuffix ??= "_arrows";
+
+            loaded.ColorPresets ??= [];
+            var normalizedPresets = new List<string>(8);
+            for (var i = 0; i < 8; i++)
+            {
+                var preset = i < loaded.ColorPresets.Count
+                    ? NormalizeColor(loaded.ColorPresets[i])
+                    : null;
+                normalizedPresets.Add(preset ?? AppSettings.DefaultColorPresets[i]);
+            }
+            loaded.ColorPresets = normalizedPresets;
+
             _settings = loaded;
         }
         catch
         {
             _settings = new AppSettings();
+        }
+    }
+
+    private void RefreshColorPresetButtons()
+    {
+        var buttons = ColorPresetPanel.Children.OfType<System.Windows.Controls.Button>().ToList();
+        for (var i = 0; i < buttons.Count && i < _settings.ColorPresets.Count; i++)
+        {
+            var hex = _settings.ColorPresets[i];
+            if (buttons[i].Content is Border swatch)
+                swatch.Background = BrushFromHex(hex);
+
+            buttons[i].ToolTip = $"{hex}\n좌클릭: 적용\n우클릭: 템플릿 색상 수정";
         }
     }
 

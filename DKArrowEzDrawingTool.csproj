@@ -10,9 +10,9 @@
     <Product>DK Arrow Ez Drawing Tool</Product>
     <Title>DK Arrow Ez Drawing Tool</Title>
     <Description>Draw and edit multi-point arrows over a reference image and export them as PNG.</Description>
-    <Version>1.0.1</Version>
-    <FileVersion>1.0.1.0</FileVersion>
-    <AssemblyVersion>1.0.1.0</AssemblyVersion>
+    <Version>1.0.2</Version>
+    <FileVersion>1.0.2.0</FileVersion>
+    <AssemblyVersion>1.0.2.0</AssemblyVersion>
     <PackageLicenseExpression>MIT</PackageLicenseExpression>
   </PropertyGroup>
 </Project>

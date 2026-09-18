@@ -114,6 +114,7 @@ public partial class MainWindow : Window
         _updatingSettingsUi = true;
         ExportSuffixTextBox.Text = _settings.ExportSuffix;
         _updatingSettingsUi = false;
+        RefreshColorPresetButtons();
         SetEditorEnabled(false);
         SetStatus("배경 이미지를 열어 시작하세요.");
     }
