@@ -224,6 +224,15 @@ public partial class MainWindow : Window
         ColorPreview.Background = BrushFromHex(normalized);
         ArrowList.Items.Refresh();
         RedrawAllArrows();
+        RememberLastCreatedArrowStyle(selected);
+    }
+
+    private void ColorPresetButton_Click(object sender, RoutedEventArgs e)
+    {
+        if (sender is not System.Windows.Controls.Button { Tag: string hex })
+            return;
+
+        ColorHexTextBox.Text = hex;
     }
 
     private void ChooseColorButton_Click(object sender, RoutedEventArgs e)
@@ -253,6 +262,7 @@ public partial class MainWindow : Window
         _updatingEditor = false;
         ArrowList.Items.Refresh();
         RedrawAllArrows();
+        RememberLastCreatedArrowStyle(selected);
     }
 
 }
