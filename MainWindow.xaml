@@ -152,7 +152,7 @@
                         <Button x:Name="HelpCloseButton" Content="×" Click="HelpCloseButton_Click" DockPanel.Dock="Right" Width="32" Height="32" FontSize="20" Padding="0"/>
                         <StackPanel>
                             <TextBlock Text="DK Arrow Ez Drawing Tool" FontSize="22" FontWeight="SemiBold"/>
-                            <TextBlock Text="사용 설명 · v1.0.2" Foreground="#667085" Margin="0,4,0,0"/>
+                            <TextBlock Text="사용 설명 · v1.1.0" Foreground="#667085" Margin="0,4,0,0"/>
                         </StackPanel>
                     </DockPanel>
                     <ScrollViewer Grid.Row="1" VerticalScrollBarVisibility="Auto">
