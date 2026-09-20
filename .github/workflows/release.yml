@@ -1,7 +1,9 @@
-name: Build and Release v1.0.2
+name: Build and Release
 
 on:
   push:
+    branches: [ main ]
+  pull_request:
     branches: [ main ]
   workflow_dispatch:
 
@@ -9,11 +11,10 @@ permissions:
   contents: write
 
 concurrency:
-  group: dkarrow-v1-release
+  group: dkarrow-release-${{ github.ref }}
   cancel-in-progress: true
 
 env:
-  VERSION: 1.0.2
   PROJECT: DKArrowEzDrawingTool.csproj
   RID: win-x64
 
@@ -25,10 +26,26 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v4
 
-      - name: Setup .NET 8
+      - name: Read version
+        shell: pwsh
+        run: |
+          [xml]$project = Get-Content $env:PROJECT
+          $version = $project.Project.PropertyGroup |
+            ForEach-Object { $_.Version } |
+            Where-Object { $_ } |
+            Select-Object -First 1
+
+          if ([string]::IsNullOrWhiteSpace([string]$version)) {
+            throw "Version was not found in $env:PROJECT"
+          }
+
+          "VERSION=$version" | Out-File -FilePath $env:GITHUB_ENV -Append
+          Write-Host "Building version $version"
+
+      - name: Setup .NET 10
         uses: actions/setup-dotnet@v4
         with:
-          dotnet-version: 8.0.x
+          dotnet-version: 10.0.x
 
       - name: Restore
         shell: pwsh
@@ -38,18 +55,67 @@ jobs:
         shell: pwsh
         run: dotnet build $env:PROJECT -c Release --no-restore
 
-      - name: Publish Windows x64 self-contained
+      - name: Publish framework-dependent single-file app
         shell: pwsh
         run: |
+          New-Item -ItemType Directory -Path "publish\app" -Force | Out-Null
           dotnet publish $env:PROJECT `
             -c Release `
             -r $env:RID `
-            --self-contained true `
+            --self-contained false `
             -p:PublishSingleFile=true `
             -p:IncludeNativeLibrariesForSelfExtract=true `
+            -p:PublishTrimmed=false `
             -p:DebugType=None `
             -p:DebugSymbols=false `
-            -o publish
+            -o "publish\app"
+
+      - name: Build native runtime launcher
+        shell: pwsh
+        run: |
+          $vswhere = Join-Path ${env:ProgramFiles(x86)} "Microsoft Visual Studio\Installer\vswhere.exe"
+          if (-not (Test-Path $vswhere)) {
+            throw "vswhere.exe was not found."
+          }
+
+          $vsPath = & $vswhere -latest -products * -requires Microsoft.VisualStudio.Component.VC.Tools.x86.x64 -property installationPath
+          if ([string]::IsNullOrWhiteSpace($vsPath)) {
+            throw "Visual C++ build tools were not found."
+          }
+
+          $vcvars = Join-Path $vsPath "VC\Auxiliary\Build\vcvars64.bat"
+          if (-not (Test-Path $vcvars)) {
+            throw "vcvars64.bat was not found."
+          }
+
+          @"
+          @echo off
+          call "$vcvars"
+          cl.exe /nologo /std:c++17 /utf-8 /O2 /MT /DUNICODE /D_UNICODE "Launcher\launcher.cpp" /link /SUBSYSTEM:WINDOWS /OUT:"publish\DK Arrow Ez Drawing Tool.exe" user32.lib shell32.lib advapi32.lib
+          "@ | Set-Content -Path build-launcher.cmd -Encoding ascii
+
+          cmd.exe /d /c build-launcher.cmd
+          if ($LASTEXITCODE -ne 0) {
+            exit $LASTEXITCODE
+          }
+
+      - name: Validate package layout
+        shell: pwsh
+        run: |
+          $launcher = "publish\DK Arrow Ez Drawing Tool.exe"
+          $app = "publish\app\DK Arrow Ez Drawing Tool.App.exe"
+
+          if (-not (Test-Path $launcher)) {
+            throw "Native launcher was not created."
+          }
+          if (-not (Test-Path $app)) {
+            throw "Application executable was not created."
+          }
+
+          Write-Host "Package files:"
+          Get-ChildItem publish -Recurse -File | ForEach-Object {
+            Write-Host ("{0} ({1:N0} bytes)" -f $_.FullName, $_.Length)
+          }
 
       - name: Package release
         shell: pwsh
@@ -57,29 +123,37 @@ jobs:
           New-Item -ItemType Directory -Path artifacts -Force | Out-Null
           $binaryZip = "DK-Arrow-Ez-Drawing-Tool-v$env:VERSION-win-x64.zip"
           $sourceZip = "DK-Arrow-Ez-Drawing-Tool-v$env:VERSION-source.zip"
+
           Compress-Archive -Path "publish\*" -DestinationPath "artifacts\$binaryZip" -CompressionLevel Optimal -Force
           git archive --format=zip --output="artifacts\$sourceZip" HEAD
+
           "BINARY_ZIP=$binaryZip" | Out-File -FilePath $env:GITHUB_ENV -Append
           "SOURCE_ZIP=$sourceZip" | Out-File -FilePath $env:GITHUB_ENV -Append
 
       - name: Upload workflow artifact
         uses: actions/upload-artifact@v4
         with:
-          name: DK-Arrow-Ez-Drawing-Tool-v1.0.2
+          name: DK-Arrow-Ez-Drawing-Tool-v${{ env.VERSION }}
           path: artifacts/*.zip
           if-no-files-found: error
 
-      - name: Create or update GitHub Release
+      - name: Create immutable GitHub Release
+        if: github.event_name != 'pull_request'
         shell: pwsh
         env:
           GH_TOKEN: ${{ github.token }}
         run: |
           $tag = "v$env:VERSION"
-          $binary = "artifacts\$env:BINARY_ZIP"
-          $source = "artifacts\$env:SOURCE_ZIP"
-          if (gh release view $tag 2>$null) {
-            gh release upload $tag $binary $source --clobber
-            gh release edit $tag --title "DK Arrow Ez Drawing Tool $tag" --notes-file RELEASE_NOTES.md
-          } else {
-            gh release create $tag $binary $source --target "$env:GITHUB_SHA" --title "DK Arrow Ez Drawing Tool $tag" --notes-file RELEASE_NOTES.md
+
+          gh release view $tag --json tagName 2>$null | Out-Null
+          if ($LASTEXITCODE -eq 0) {
+            Write-Host "Release $tag already exists. Existing release assets are left unchanged."
+            exit 0
           }
+
+          gh release create $tag `
+            "artifacts\$env:BINARY_ZIP" `
+            "artifacts\$env:SOURCE_ZIP" `
+            --target "$env:GITHUB_SHA" `
+            --title "DK Arrow Ez Drawing Tool $tag" `
+            --notes-file RELEASE_NOTES.md
