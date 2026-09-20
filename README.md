@@ -25,9 +25,25 @@
 
 ## 다운로드 및 실행
 
-GitHub의 **Releases**에서 최신 Windows x64 ZIP 파일을 내려받아 원하는 폴더에 압축을 풀고 `DK Arrow Ez Drawing Tool.exe`를 실행하면 됩니다.
+GitHub의 **Releases**에서 최신 Windows x64 ZIP 파일을 내려받아 원하는 폴더에 압축을 풀고 루트의 `DK Arrow Ez Drawing Tool.exe`를 실행합니다.
 
-배포본은 self-contained 방식으로 빌드되므로 별도의 .NET 설치 없이 실행할 수 있도록 구성되어 있습니다.
+v1.1.0부터 배포본은 **.NET 10 framework-dependent single-file** 방식입니다. .NET 런타임 자체를 ZIP에 중복 포함하지 않기 때문에 이전 self-contained 배포본보다 파일 크기가 작습니다.
+
+실행 런처가 **Microsoft .NET 10 Desktop Runtime (x64)** 설치 여부를 먼저 확인합니다.
+
+- 런타임이 설치되어 있으면 실제 앱을 바로 실행합니다.
+- 런타임이 없으면 한국어 안내창을 표시하고 Microsoft 공식 다운로드 페이지를 열 수 있습니다.
+- 런타임 설치 후 프로그램을 다시 실행하면 됩니다.
+
+배포본의 기본 구조는 다음과 같습니다.
+
+```text
+DK Arrow Ez Drawing Tool.exe
+app/
+  DK Arrow Ez Drawing Tool.App.exe
+```
+
+사용자는 루트의 `DK Arrow Ez Drawing Tool.exe`만 실행하면 됩니다.
 
 ## 기본 사용법
 
@@ -80,13 +96,20 @@ GitHub의 **Releases**에서 최신 Windows x64 ZIP 파일을 내려받아 원�
 
 필요 환경:
 
-- Windows 10/11
-- .NET 8 SDK
+- Windows 10/11 x64
+- .NET 10 SDK
+- Visual Studio 2022 Build Tools의 C++ x64 빌드 도구(배포 런처 빌드 시)
+
+앱 본체 개발 실행:
 
 ```powershell
 dotnet build -c Release
 dotnet run -c Release --no-build
 ```
+
+GitHub Actions의 릴리스 워크플로는 앱을 framework-dependent single-file로 게시하고, 별도의 네이티브 런처를 빌드한 뒤 Windows x64 ZIP을 생성합니다.
+
+릴리스 버전은 `DKArrowEzDrawingTool.csproj`의 `Version`을 기준으로 하며, 이미 같은 버전의 GitHub Release가 있으면 기존 자산을 덮어쓰지 않습니다.
 
 ## 라이선스
 
