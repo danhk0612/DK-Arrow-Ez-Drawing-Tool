@@ -1,13 +1,21 @@
-# DK Arrow Ez Drawing Tool v1.0.2
+# DK Arrow Ez Drawing Tool v1.1.0
 
-색상 템플릿 사용성을 수정한 패치 버전입니다.
+배포 구조와 런타임 기반을 정리한 버전입니다. 기존 그리기, 편집, 저장/복원, 설정 저장, PNG 출력 기능은 유지됩니다.
 
 ## 변경 사항
 
-- 색상 템플릿의 실제 색상이 버튼 안에 확실하게 표시되도록 수정
-- 각 색상 템플릿을 우클릭하여 원하는 색상으로 수정 가능
-- 수정한 색상 템플릿을 설정 파일에 저장하여 프로그램 재실행 후에도 유지
-- 선택된 화살표가 없을 때 템플릿을 좌클릭하면 다음 새 화살표의 기본 색상으로 지정
-- 템플릿 버튼 툴팁에 현재 색상 코드와 좌/우클릭 동작 표시
+- 대상 프레임워크를 .NET 8에서 .NET 10으로 변경
+- Windows x64 self-contained 배포를 framework-dependent single-file 배포로 변경
+- 사용자 실행 파일 이름은 기존처럼 `DK Arrow Ez Drawing Tool.exe`로 유지
+- 실제 WPF 앱을 `app/DK Arrow Ez Drawing Tool.App.exe`로 분리
+- 작은 x64 네이티브 런처를 추가하여 .NET 10 Desktop Runtime 설치 여부를 실행 전에 확인
+- 필요한 런타임이 없으면 한국어 안내와 Microsoft 공식 다운로드 페이지 열기 제공
+- GitHub Actions 릴리스 버전을 프로젝트 파일에서 읽도록 변경
+- 이미 존재하는 같은 버전의 GitHub Release 자산을 덮어쓰지 않도록 변경
+- Pull Request에서도 실제 .NET 10 앱/네이티브 런처 빌드와 ZIP 패키징을 검증하도록 변경
 
-기존 그리기, 편집, 저장/복원, PNG 출력 기능은 변경하지 않았습니다.
+## 호환성
+
+- Windows 10/11 x64
+- Microsoft .NET 10 Desktop Runtime (x64) 필요
+- 기존 사용자 설정은 계속 `%LOCALAPPDATA%\DK Arrow Ez Drawing Tool\settings.json`에 저장되므로 프로그램 파일 교체와 독립적으로 유지됩니다.
